@@ -22,13 +22,15 @@ $.ajax({
                     };
                     render(obj);
                     const arrStarShip = [];
-                    for (let j =0; j<starShips.length; j++) {
+                    const arrStarShipObj = [];
+                    for (let j = 0; j < starShips.length; j++) {
 
                         $.ajax({
                             type: "GET",
                             url: starShips[j], // указываем URL
                             dataType: "json",
                             success: function (ship) {
+                                arrStarShipObj.push(ship);
                                 arrStarShip.push(ship.name);
 
                             },
@@ -37,8 +39,8 @@ $.ajax({
                             }
                         });
                     }
+                    obj.arrStarShips = arrStarShipObj;
                     obj.starshipName = arrStarShip;
-                    console.log(obj);
                 },
                 error: function (home) {
                     console.log(home);
@@ -54,22 +56,22 @@ $.ajax({
 function render(obj) {
     const ob = obj;
     const li = document.createElement('li');
-    li.innerHTML = `<p>Имя: ${obj.name}</p><p>Пол: ${obj.gender}</p><p>Родной мир персонажа: ${obj.homeworld}</p>`;
-    if (obj.starships.length !== 0) {
+    li.innerHTML = `<p>Имя: ${ob.name}</p><p>Пол: ${ob.gender}</p><p>Родной мир персонажа: ${ob.homeworld}</p>`;
+    if ($(ob.starships).length !== 0) {
         const btn = document.createElement('button');
-        btn.textContent= "Список кораблей";
-        btn.setAttribute('data-name', ob.name);
-        li.appendChild(btn);
+        $(btn).text("Список кораблей");
+        $(btn).attr('data-name', ob.name);
+        $(li).append($(btn));
 
-        btn.addEventListener('click', function () {
+        $(btn).click(function () {
             let targ = event.target;
             clickBtn(ob);
             showStarsipsName(ob, targ);
         });
 
     }
-    ol.appendChild(li);
-    list.appendChild(ol);
+    $(ol).append($(li));
+    $(list).append($(ol));
 }
 
 function clickBtn(obj) {
@@ -81,94 +83,43 @@ function showStarsipsName(obj, place) {
 
     for (let k = 0; k < obj.starshipName.length; k++) {
         const liShip = document.createElement('li');
-        liShip.textContent = obj.starshipName[k];
-        olShip.appendChild(liShip)
+        let a = document.createElement("a");
+        $(a).html(`${obj.starshipName[k]}`);
+        $(a).attr("href", "#");
+        $(a).click(function () {
+            clickLink(obj)
+        });
+        $(liShip).append($(a));
+        $(olShip).append($(liShip));
     }
     const title = document.getElementsByTagName('h3');
-    for (let r=0; r<title.length; r++)  {
+    for (let r = 0; r < title.length; r++)  {
         if(place.dataset.name == title[r].id) {
             $(olShip).insertAfter($(title[r]));
         }
     }
 }
 
+function clickLink(obj) {
+ const link = document.getElementsByTagName('a');
+    for (let r = 0; r < link.length; r++)  {
+        if (event.target == link[r]) {
+            link[r].style.color = "green";
+            rendlerListLink(obj);
+        }
+    }
+}
+function rendlerListLink(obj) {
+    const liShipDetailsList = document.createElement("ul");
+let targetLink = $(event.target).text();
+let trg = event.target;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// const list = document.getElementById('list');
-// let ol = document.createElement('ol');
-// //
-// let obj = $.ajax({
-//     type: "GET",
-//     url: 'https://swapi.co/api/people/',
-//     dataType: "json",
-//     success: function(data) { // если запрос прошел удачно
-//         // console.log(data);
-//         // console.log(data);
-//         let arr =data.results;
-//         for ( let i =0; i< arr; i++) {
-//             let objPers = {};
-//             objPers.namePerson = arr[i].name;
-//             objPers.genderPerson = arr[i].gender;
-//             objPers.addressWorld = arr[i].homeworld;
-//             console.log(objPers);
-//         }
-//         return data;
-//     },
-//     error: function(data) {
-//         console.log(data);
-//     }
-// });
-// let namePerson, genderPerson, addressWorld, nameWorld;
-// console.log(obj);
-// let arr = [];
-// let resJson = JSON.parse(obj);
-// console.log(resJson);
-// for ( let i =0; i< obj.results; i++) {
-//     let objPers = {};
-//     objPers.namePerson = obj.results[i].name;
-//     objPers.genderPerson = obj.results[i].gender;
-//     objPers.addressWorld = obj.results[i].homeworld;
-//     console.log(objPers);
-// let world = $.ajax({
-//     type: "GET",
-//     url: `${obj.result[i].homeworld}`,
-//     dataType: "json",
-//     success: function (data) { // если запрос прошел удачно
-//         // console.log(data);
-//         console.log(data);
-//     },
-//     error: function (data) {
-//         console.log(data);
-//     }
-// });
-// objPers.nameWorld = world.results.name;
-// console.log(objPers);
-//     arr.push(objPers);
-//     console.log(arr);
-// }
-
-
-// function render(name, gender, homeName) {
-//     let li = document.createElement('li');
-//     li.innerHTML = `<p>Имя: ${name}</p><p>Пол: ${gender}</p><p>Родной мир персонажа: ${homeName}</p>`;
-//     ol.appendChild(li);
-// }
-
+    for (let r = 0; r < obj.arrStarShips.length; r++)  {
+        if (targetLink == obj.arrStarShips[r].name) {
+            let liShipDetails = document.createElement('li');
+            $(liShipDetails).html(`<p>Модель: ${obj.arrStarShips[r].model}</p><p>Класс: ${obj.arrStarShips[r].starship_class}</p><p>К-во пасажиров: ${obj.arrStarShips[r].passengers}</p>`);
+            $(liShipDetailsList).append($(liShipDetails));
+            $(liShipDetailsList).insertAfter($(trg));
+        }
+    }
+}
